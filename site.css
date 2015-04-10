@@ -1,0 +1,57 @@
+html {
+  box-sizing: border-box;
+}
+
+*, *:before, *:after {
+  box-sizing: inherit;
+}
+
+body {
+  background: #F7FAFB;
+  color: #0087C8;
+  font-family: 'Open Sans', sans-serif;
+  margin: 0;
+  height: 100%;
+  padding-top: 200px;
+}
+
+.badge-container {
+  width: 100%;
+  margin: 0 auto;
+  background: #FFF;
+  padding: 35px;
+  border: 1px solid #ECEFF0;
+}
+
+.logo-octoblu {
+  display: block;
+  width: 100%;
+  margin: 0 auto;
+}
+
+@media (min-width: 800px) {
+  .badge-container {
+    width: 66%;
+  }
+}
+
+@media (min-width: 1200px) {
+  .badge-container {
+    width: 50%;
+  }
+}
+
+h1, h2, h3, h4 {
+  font-weight: 600;
+}
+
+.copy {
+  font-size: 27px;
+  line-height: 1.5;
+  font-weight: 300;
+}
+
+.header {
+  margin-top: 0;
+  font-size: 50px;
+}
