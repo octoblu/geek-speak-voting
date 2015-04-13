@@ -1,62 +1,27 @@
-var MeshbluConnection = {};
+var VOTE_COUNTER_UUID = "1d943f90-e20b-11e4-bb50-af4820817324";
+var VOTE_BUTTONS = {
+  Yes: '499d9820-e20b-11e4-a9c3-512b26405d66',
+  No: 'b5a9a8b0-e20b-11e4-a9c3-512b26405d66'
+};
+
 var localStorage = {};
 var defaultVotes = {
   yes: 0,
   no: 0,
-  total: 0
+  total: 0,
+  loading: true
 };
-
-var App = {};
 
 var VoteButton = React.createClass({
 
   handleClick: function() {
     vote = this.props.value;
-
-    var votes = App.state;
-    console.log('Votes', votes);
-
-    
-    if (vote === 'Yes') {
-      votes.yes++;
-    } else {
-      votes.no++;
-    }
-    votes.total = votes.yes + votes.no;
-    this.emitVoteMessage(votes);
-  },
-
-  emitVoteMessage: function(votes)  {
-    console.log('Emit:', votes);
-    App.setState(votes);
-    MeshbluConnection.message({
-      devices: localStorage.deviceUUID,
-
-      payload: {
-        votes: votes
-      }
-    });
+    this.props.onVote(vote);
   },
 
   render: function () {
     return (
       <button className="vote-button" value={this.props.value} onClick={this.handleClick}>{this.props.value}</button>
-    );
-  }
-});
-
-var VoteButtons = React.createClass({
-  recordVote: function(event) {
-    console.log(event);
-    console.log(this.refs);
-  },
-
-  render: function() {
-    return (
-      <div className="vote-buttons">
-        <VoteButton value="Yes" />
-        <VoteButton value="No"/>
-      </div>
     );
   }
 });
@@ -74,13 +39,11 @@ var VoteResults = React.createClass({
   }
 });
 
-App = React.createClass({
+var App = React.createClass({
   getInitialState: function() {
     MeshbluConnection = meshblu.createConnection({
       uuid: localStorage.deviceUUID,
-      token: localStorage.deviceToken,
-      server: 'wss://meshblu.octoblu.com',
-      port: 443
+      token: localStorage.deviceToken
     });
 
     return defaultVotes;
@@ -97,41 +60,69 @@ App = React.createClass({
 
       MeshbluConnection.update({type: 'device:synergy-vote'});
 
-      MeshbluConnection.whoami({}, function(myDevice) {
-        console.log('The device is ', myDevice, self.state);
-        if (myDevice.votes) {
-          self.setState(myDevice.votes);
-        }
+      MeshbluConnection.subscribe({uuid: VOTE_COUNTER_UUID, token: VOTE_COUNTER_TOKEN });
+
+      MeshbluConnection.device({uuid: VOTE_COUNTER_UUID}, function(device){
+        console.log('device', device);
+        device = device.device;
+        self.setState({
+          yes: device.data.yes,
+          no: device.data.no,
+          total: device.data.yes + device.data.no,
+          loading: false
+        });
       });
 
     });
+
   },
 
   componentDidMount: function() {
     var self = this;
     MeshbluConnection.on('message', function(message) {
+      if (message.topic !== 'message') return;
 
-      if (message.payload.votes) {
-        MeshbluConnection.whoami({}, function(myDevice) {
-          console.log('The device is ', myDevice, self.state);
-          myDevice.votes = message.payload.votes;
-          MeshbluConnection.update(myDevice);
-        });
-      }
+      console.log('got message', message);
+
+      self.setState({
+        yes: message.yes,
+        no: message.no,
+        total: message.yes + message.no
+      });
     });
 
   },
 
+  handleVote: function(vote) {
+      MeshbluConnection.message({
+        devices: VOTE_COUNTER_UUID,
+        topic: 'button',
+        payload : {
+          from: VOTE_BUTTONS[vote]
+        }
+      });
+  },
+
   render: function() {
+    var results;
+
+    if (this.state.loading) {
+      results = <p>Loading....</p>
+    } else {
+      results = <VoteResults yesCount={this.state.yes} noCount={this.state.no} totalCount={this.state.total} />
+    }
+
     return (
       <div>
-        <VoteResults yesCount={this.state.yes} noCount={this.state.no} totalCount={this.state.total}/>
-        <VoteButtons />
+        {results}
+
+        <div className="vote-buttons">
+          <VoteButton value="Yes" ref="yes" onVote={this.handleVote}/>
+          <VoteButton value="No" ref="no" onVote={this.handleVote}/>
+        </div>
       </div>
     );
   }
 });
-
-
 
 React.render(<App />, document.getElementById('app'));
