@@ -1,3 +1,4 @@
+// TODO: Remove UUIDs
 var VOTE_COUNTER_UUID = "1d943f90-e20b-11e4-bb50-af4820817324";
 var VOTE_COUNTER_TOKEN = "3bff36d85a567904e05e122658a25688c4743369";
 var VOTE_BUTTONS = {
@@ -5,7 +6,6 @@ var VOTE_BUTTONS = {
   No: 'b5a9a8b0-e20b-11e4-a9c3-512b26405d66'
 };
 
-var localStorage = {};
 var defaultVotes = {
   yes: 0,
   no: 0,
@@ -31,7 +31,6 @@ var VoteButton = React.createClass({
 });
 
 var VoteResults = React.createClass({
-
   countInPercent: function(count) {
     var percentValue = Math.ceil((count/this.props.totalCount) * 100);
     return percentValue.toString() + "%";
@@ -71,14 +70,12 @@ var App = React.createClass({
       localStorage.deviceUUID  = device.uuid;
       localStorage.deviceToken = device.token;
 
-      console.log('ready', device);
 
       MeshbluConnection.update({type: 'device:synergy-vote'});
 
       MeshbluConnection.subscribe({uuid: VOTE_COUNTER_UUID, token: VOTE_COUNTER_TOKEN });
 
       MeshbluConnection.device({uuid: VOTE_COUNTER_UUID}, function(device){
-        console.log('device', device);
         device = device.device;
         yes = parseInt(device.data.yes, 10);
         no = parseInt(device.data.no, 10);
@@ -90,17 +87,13 @@ var App = React.createClass({
           loading: false
         });
       });
-
     });
-
   },
 
   componentDidMount: function() {
     var self = this;
     MeshbluConnection.on('message', function(message) {
       if (message.topic !== 'message') return;
-
-      console.log('got message', message);
 
       yes = parseInt(message.yes, 10);
       no = parseInt(message.no, 10);
@@ -115,13 +108,13 @@ var App = React.createClass({
   },
 
   handleVote: function(vote) {
-      MeshbluConnection.message({
-        devices: VOTE_COUNTER_UUID,
-        topic: 'button',
-        payload : {
-          from: VOTE_BUTTONS[vote]
-        }
-      });
+    MeshbluConnection.message({
+      devices: VOTE_COUNTER_UUID,
+      topic: 'button',
+      payload : {
+        from: VOTE_BUTTONS[vote]
+      }
+    });
   },
 
   render: function() {
