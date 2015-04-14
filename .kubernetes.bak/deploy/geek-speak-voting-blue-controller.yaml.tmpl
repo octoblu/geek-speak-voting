@@ -1,0 +1,26 @@
+id: geek-speak-voting-blue-controller
+kind: ReplicationController
+apiVersion: v1beta1
+labels:
+  name: geek-speak-voting-blue
+  version: "$SHORT_COMMIT"
+desiredState:
+  replicas: 2
+  replicaSelector:
+    name: geek-speak-voting-blue
+    version: "$SHORT_COMMIT"
+  podTemplate:
+    labels:
+      name: geek-speak-voting-blue
+      app: geek-speak-voting-blue
+      version: "$SHORT_COMMIT"
+    desiredState:
+      manifest:
+        version: v1beta1
+        id: geek-speak-voting-blue
+        containers:
+          - name: geek-speak-voting-blue
+            image: octoblu/geek-speak-voting:$SHORT_COMMIT
+            ports:
+              - containerPort: 9000
+
