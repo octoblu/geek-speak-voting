@@ -1,6 +1,4 @@
-// TODO: Remove UUIDs
-var VOTE_COUNTER_UUID = "1d943f90-e20b-11e4-bb50-af4820817324";
-var VOTE_COUNTER_TOKEN = "3bff36d85a567904e05e122658a25688c4743369";
+var FLOW_UUID = "1d943f90-e20b-11e4-bb50-af4820817324";
 var VOTE_BUTTONS = {
   Yes: '499d9820-e20b-11e4-a9c3-512b26405d66',
   No: 'b5a9a8b0-e20b-11e4-a9c3-512b26405d66'
@@ -73,9 +71,9 @@ var App = React.createClass({
 
       MeshbluConnection.update({type: 'device:synergy-vote'});
 
-      MeshbluConnection.subscribe({uuid: VOTE_COUNTER_UUID, token: VOTE_COUNTER_TOKEN });
+      MeshbluConnection.subscribe({uuid: FLOW_UUID});
 
-      MeshbluConnection.device({uuid: VOTE_COUNTER_UUID}, function(device){
+      MeshbluConnection.device({uuid: FLOW_UUID}, function(device){
         device = device.device;
         yes = parseInt(device.data.yes, 10);
         no = parseInt(device.data.no, 10);
@@ -109,7 +107,7 @@ var App = React.createClass({
 
   handleVote: function(vote) {
     MeshbluConnection.message({
-      devices: VOTE_COUNTER_UUID,
+      devices: FLOW_UUID,
       topic: 'button',
       payload : {
         from: VOTE_BUTTONS[vote]

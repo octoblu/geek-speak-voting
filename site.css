@@ -36,6 +36,12 @@ h1, h2, h3, h4 {
   }
 }
 
+.octoblu-icon {
+  height : 96px;
+  width : 96px;
+  margin : 30px auto 0;
+  display: block;
+}
 .vote-button {
   border: none;
   width: 46%;
@@ -44,17 +50,31 @@ h1, h2, h3, h4 {
 
   background: #04C9A8;
   color: #FFF;
-  font-size: 2em;
-  font-weight: 600;
-
+  font-size: 1.5em;
+  font-weight: 300;
 
   cursor: pointer;
+}
+
+.vote-button:hover {
+  background: #05A78C;
 }
 
 .vote-button:last-child {
   background: #E74C3C;
 }
 
+.vote-button:last-child:hover {
+  background: #B63B2F;
+}
+
+
+@media (min-width: 800px) {
+  .vote-button {
+    font-size: 2em;
+    font-weight: 600;
+  }
+}
 .results {
   height: 50%;
   width: 100%;
